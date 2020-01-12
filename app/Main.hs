@@ -2,7 +2,7 @@ module Main where
 
 import           Data.Char
 import           Input     (readProgramFromFile)
-import           Memory    (fromProgram)
+import           Memory    (fromProgram, store, load)
 
 main :: IO ()
 main = do
@@ -10,3 +10,4 @@ main = do
   let vm = fromProgram program
   print program
   print vm
+  print $ store vm 2 1234
