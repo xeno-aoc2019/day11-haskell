@@ -12,7 +12,7 @@ parse acc (x   : xs)  = parse (acc * 10 + (c x)) xs
 readProgramFromFile :: string -> IO [Int]
 readProgramFromFile filename = do
     programString <- readFile "input.txt"
-    print programString
+    -- print programString
     return (parse 0 programString)
 
 
