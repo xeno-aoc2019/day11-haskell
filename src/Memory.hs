@@ -13,12 +13,14 @@ module Memory
   , getIP
   , setIP
   , step
+  , getInstruction
   ) where
 
 import           Data.List.Index
 import           Data.Map.Strict
 import           Data.Sequence
 import           Prelude         hiding (filter, lookup, map, null)
+import           Instruction (parseInstruction, Instruction)
 
 data Memory =
   Memory (Map Int Int) (Seq Int) (Seq Int) Int Bool
@@ -36,6 +38,7 @@ halt :: Memory -> Memory
 getIP :: Memory -> Int
 setIP :: Memory -> Int -> Memory
 step :: Memory -> Int -> Memory
+getInstruction :: Memory -> Instruction
 
 instance Show Memory where
   show (Memory m input output ip halted) = show "Memory: " ++ show m ++ " input=" ++ show input ++ " output=" ++ show output
@@ -68,3 +71,6 @@ getIP (Memory vm input output ip halted) = ip
 setIP (Memory vm input output ip halted) newIp = Memory vm input output newIp halted
 
 step (Memory vm input output ip halted) steps = Memory vm input output (ip + steps) halted
+
+getInstruction (Memory vm input output ip halted) =
+  parseInstruction $ vm ! ip
