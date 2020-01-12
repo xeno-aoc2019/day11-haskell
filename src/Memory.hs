@@ -8,6 +8,11 @@ module Memory
   , getInput
   , addOutput
   , getOutput
+  , isHalted
+  , halt
+  , getIP
+  , setIP
+  , step
   ) where
 
 import           Data.List.Index
@@ -26,6 +31,12 @@ addOutput :: Memory -> Int -> Memory
 getOutput :: Memory -> (Int, Memory)
 getInput :: Memory -> (Int, Memory)
 hasInput :: Memory -> Bool
+isHalted :: Memory -> Bool
+halt :: Memory -> Memory
+getIP :: Memory -> Int
+setIP :: Memory -> Int -> Memory
+step :: Memory -> Int -> Memory
+
 instance Show Memory where
   show (Memory m input output ip halted) = show "Memory: " ++ show m ++ " input=" ++ show input ++ " output=" ++ show output
 
@@ -47,3 +58,13 @@ addInput (Memory vm inp outp ip halted) value = Memory vm (inp |> value) outp ip
 addOutput (Memory vm inp outp ip halted) value = Memory vm (inp |> value) outp ip halted
 
 getOutput (Memory vm inp (val :<| outp) ip halted) = (val, Memory vm inp outp ip halted)
+
+isHalted (Memory vm input output ip halted) = halted
+
+halt (Memory vm input output ip halted) = Memory vm input output ip True
+
+getIP (Memory vm input output ip halted) = ip
+
+setIP (Memory vm input output ip halted) newIp = Memory vm input output newIp halted
+
+step (Memory vm input output ip halted) steps = Memory vm input output (ip + steps) halted
