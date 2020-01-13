@@ -1,9 +1,10 @@
 module Instruction
   ( Instruction
-  , Operation
+  , Operation(..)
   , parseInstruction
   , mode
   , opcode
+  , Mode(..)
   ) where
 
 data Operation
@@ -18,15 +19,23 @@ data Operation
   | I_RBO
   | I_HALT
 
+data Mode
+  = MODE_REFERENCE
+  | MODE_VALUE
+  | MODE_RELATIVE
+
 data Instruction =
-  Instruction Operation Int Int Int
+  Instruction Operation Mode Mode Mode
 
 parseInstruction :: Int -> Instruction
 opcode :: Instruction -> Operation
-mode :: Instruction -> Int -> Int
-
+mode :: Instruction -> Int -> Mode
 parseInstruction value =
-  Instruction (toOperation $ parseOpcode value) (parseMode value 1) (parseMode value 2) (parseMode value 3)
+  Instruction
+    (toOperation $ parseOpcode value)
+    (toMode $ parseMode value 1)
+    (toMode $ parseMode value 2)
+    (toMode $ parseMode value 3)
 
 opcode (Instruction oc m1 m2 m3) = oc
 
@@ -50,3 +59,7 @@ toOperation 7  = I_LT
 toOperation 8  = I_EQ
 toOperation 9  = I_RBO
 toOperation 99 = I_HALT
+
+toMode 0 = MODE_REFERENCE
+toMode 1 = MODE_VALUE
+toMode 2 = MODE_RELATIVE

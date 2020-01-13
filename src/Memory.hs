@@ -6,24 +6,28 @@ module Memory
   , store
   , addInput
   , getInput
+  , hasInput
   , addOutput
   , getOutput
   , isHalted
   , halt
   , getIP
   , setIP
+  , getRB
+  , setRB
   , step
   , getInstruction
+  , loadRelative
   ) where
 
 import           Data.List.Index
 import           Data.Map.Strict
 import           Data.Sequence
+import           Instruction     (Instruction, parseInstruction)
 import           Prelude         hiding (filter, lookup, map, null)
-import           Instruction (parseInstruction, Instruction)
 
 data Memory =
-  Memory (Map Int Int) (Seq Int) (Seq Int) Int Bool
+  Memory (Map Int Int) (Seq Int) (Seq Int) Int Int Bool
 
 fromProgram :: [Int] -> Memory
 store :: Memory -> Int -> Int -> Memory
@@ -37,40 +41,48 @@ isHalted :: Memory -> Bool
 halt :: Memory -> Memory
 getIP :: Memory -> Int
 setIP :: Memory -> Int -> Memory
+getRB :: Memory -> Int
+setRB :: Memory -> Int -> Memory
 step :: Memory -> Int -> Memory
 getInstruction :: Memory -> Instruction
-
+loadRelative :: Memory -> Int -> Int
 instance Show Memory where
-  show (Memory m input output ip halted) = show "Memory: " ++ show m ++ " input=" ++ show input ++ " output=" ++ show output
+  show (Memory m input output ip rb halted) =
+    show "Memory: " ++ show m ++ " input=" ++ show input ++ " output=" ++ show output
 
 fromProgram program =
   let prog = Data.Map.Strict.fromList $ indexed program
-   in Memory prog Empty Empty 0 False
+   in Memory prog Empty Empty 0 0 False
 
-hasInput (Memory vm Empty output ip halted) = False
-hasInput (Memory vm (x :<| xs) output ip halted) = True
+hasInput (Memory vm Empty output ip rb halted)      = False
+hasInput (Memory vm (x :<| xs) output ip rb halted) = True
 
-store (Memory vm input output ip halted) position value = Memory (insert position value vm) input output ip halted
+store (Memory vm input output ip rb halted) position value = Memory (insert position value vm) input output ip rb halted
 
-load (Memory vm input output ip halted) position = vm ! position
+load (Memory vm input output ip rb halted) position = vm ! position
 
-getInput (Memory vm (val :<| inp) outp ip halted) = (val, Memory vm inp outp ip halted)
+getInput (Memory vm (val :<| inp) outp ip rb halted) = (val, Memory vm inp outp ip rb halted)
 
-addInput (Memory vm inp outp ip halted) value = Memory vm (inp |> value) outp ip halted
+addInput (Memory vm inp outp ip rb halted) value = Memory vm (inp |> value) outp ip rb halted
 
-addOutput (Memory vm inp outp ip halted) value = Memory vm (inp |> value) outp ip halted
+addOutput (Memory vm inp outp ip rb halted) value = Memory vm (inp |> value) outp ip rb halted
 
-getOutput (Memory vm inp (val :<| outp) ip halted) = (val, Memory vm inp outp ip halted)
+getOutput (Memory vm inp (val :<| outp) ip rb halted) = (val, Memory vm inp outp ip rb halted)
 
-isHalted (Memory vm input output ip halted) = halted
+isHalted (Memory vm input output ip rb halted) = halted
 
-halt (Memory vm input output ip halted) = Memory vm input output ip True
+halt (Memory vm input output ip rb halted) = Memory vm input output ip rb True
 
-getIP (Memory vm input output ip halted) = ip
+getIP (Memory vm input output ip rb halted) = ip
 
-setIP (Memory vm input output ip halted) newIp = Memory vm input output newIp halted
+setIP (Memory vm input output ip rb halted) newIp = Memory vm input output newIp rb halted
 
-step (Memory vm input output ip halted) steps = Memory vm input output (ip + steps) halted
+step (Memory vm input output ip rb halted) steps = Memory vm input output (ip + steps) rb halted
 
-getInstruction (Memory vm input output ip halted) =
-  parseInstruction $ vm ! ip
+getInstruction (Memory vm input output ip rb halted) = parseInstruction $ vm ! ip
+
+loadRelative (Memory vm input output ip rb halted) n = vm ! ip + n
+
+getRB (Memory vm input output ip rb halted) = rb
+
+setRB (Memory vm input output ip rb halted) newRb = Memory vm input output ip newRb halted
