@@ -48,7 +48,10 @@ getInstruction :: Memory -> Instruction
 loadRelative :: Memory -> Int -> Int
 instance Show Memory where
   show (Memory m input output ip rb halted) =
-    show "Memory: " ++ show m ++ " input=" ++ show input ++ " output=" ++ show output
+    show "Memory: " ++
+    show m ++
+    " input=" ++
+    show input ++ " output=" ++ show output ++ " IP=" ++ show ip ++ " RB=" ++ show rb ++ " halted=" ++ show halted
 
 fromProgram program =
   let prog = Data.Map.Strict.fromList $ indexed program

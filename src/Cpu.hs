@@ -5,7 +5,7 @@ module Cpu
 import           Instruction
 import           Memory
 
-run :: Memory -> Memory
+run :: Memory -> (Bool, Bool, Memory)
 getParam :: Memory -> Instruction -> Int -> Int
 paramValue :: Memory -> Mode -> Int -> Int -> Int
 paramValue vm MODE_REFERENCE rb value = load vm value
@@ -29,8 +29,8 @@ storeParam vm inst index value =
    in vm
 
 isIoWait1 :: Memory -> Operation -> Bool -> Bool
-isIoWait1 vm  I_IN False          = True
-isIoWait1 vm  op   inputAvailable = False
+isIoWait1 vm I_IN False        = True
+isIoWait1 vm op inputAvailable = False
 
 isIoWait vm =
   let op = opcode $ getInstruction vm
@@ -61,46 +61,54 @@ execInstruction I_MUL inst vm =
    in vm2
 execInstruction I_IN inst vm =
   let param = getParam vm inst 1
-      (input, vm2) = getInput vm
-   in storeParam vm2 inst param input
+      (input, vm1) = getInput vm
+      vm2 = storeParam vm1 inst param input
+      vm3 = step vm2 2
+   in vm3
 execInstruction I_OUT inst vm =
   let param = getParam vm inst 1
-   in addOutput vm param
-
+      vm1 = addOutput vm param
+      vm2 = step vm 2
+   in vm2
 execInstruction I_JT inst vm =
   let param1 = getParam vm inst 1
       addr = loadRelative vm 2
       mod = mode inst 2
       rb = getRB vm
    in jumpIfTrue vm param1 mod rb addr 3
-
 execInstruction I_JF inst vm =
   let param1 = getParam vm inst 1
       addr = loadRelative vm 2
       mod = mode inst 2
       rb = getRB vm
    in jumpIfTrue vm (neg param1) mod rb addr 3
-
 execInstruction I_EQ inst vm =
   let param1 = getParam vm inst 1
       param2 = getParam vm inst 2
-   in if param1 == param2
-      then storeParam vm inst 3 1
-      else storeParam vm inst 3 0
-
+      vm1 = if param1 == param2
+        then storeParam vm inst 3 1
+        else storeParam vm inst 3 0
+      vm2 = step vm1 4
+   in vm2
 execInstruction I_LT inst vm =
   let param1 = getParam vm inst 1
       param2 = getParam vm inst 2
-   in if param1 < param2
-      then storeParam vm inst 3 1
-      else storeParam vm inst 3 0
+      vm1 = if param1 < param2
+        then storeParam vm inst 3 1
+        else storeParam vm inst 3 0
+      vm2 = step vm1 4
+   in vm2
+execInstruction I_RBO inst vm =
+  let param1 = getParam vm inst 1
+      vm1 = setRB vm param1
+      vm2 = step vm1 2
+   in vm2
+
+execInstruction I_HALT inst vm = halt vm
 
 execCurrent vm =
   let inst = getInstruction vm
       op = opcode inst
-   in vm
+   in execInstruction op inst vm
 
-run vm =
-  if isIoWait vm
-    then vm
-    else run $ execCurrent vm
+run vm = (isIoWait vm, isHalted vm, execCurrent vm)

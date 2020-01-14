@@ -3,6 +3,7 @@ module Main where
 import           Data.Char
 import           Input     (readProgramFromFile)
 import           Memory    (fromProgram, store, load, addInput, getInput, addOutput, getOutput)
+import           Cpu       (run)
 
 main :: IO ()
 main = do
@@ -13,3 +14,5 @@ main = do
   let vm1 = addInput vm 10
   let vm2 = addInput vm1 20
   print vm2
+  let vm3 = run vm2
+  print vm3
