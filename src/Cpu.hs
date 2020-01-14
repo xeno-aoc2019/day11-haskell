@@ -5,7 +5,7 @@ module Cpu
 import           Instruction
 import           Memory
 
-run :: Memory -> (Bool, Bool, Memory)
+run :: Memory -> Memory
 getParam :: Memory -> Instruction -> Int -> Int
 paramValue :: Memory -> Mode -> Int -> Int -> Int
 paramValue vm MODE_REFERENCE rb value = load vm value
@@ -26,7 +26,7 @@ storeParam vm inst index value =
   let mod = mode inst index
       param = loadRelative vm index
       rb = getRB vm
-   in vm
+   in storeValue vm mod rb param value
 
 isIoWait1 :: Memory -> Operation -> Bool -> Bool
 isIoWait1 vm I_IN False        = True
@@ -60,9 +60,8 @@ execInstruction I_MUL inst vm =
       vm2 = step vm1 4
    in vm2
 execInstruction I_IN inst vm =
-  let param = getParam vm inst 1
-      (input, vm1) = getInput vm
-      vm2 = storeParam vm1 inst param input
+  let (input, vm1) = getInput vm
+      vm2 = storeParam vm1 inst 1 input
       vm3 = step vm2 2
    in vm3
 execInstruction I_OUT inst vm =
@@ -85,17 +84,19 @@ execInstruction I_JF inst vm =
 execInstruction I_EQ inst vm =
   let param1 = getParam vm inst 1
       param2 = getParam vm inst 2
-      vm1 = if param1 == param2
-        then storeParam vm inst 3 1
-        else storeParam vm inst 3 0
+      vm1 =
+        if param1 == param2
+          then storeParam vm inst 3 1
+          else storeParam vm inst 3 0
       vm2 = step vm1 4
    in vm2
 execInstruction I_LT inst vm =
   let param1 = getParam vm inst 1
       param2 = getParam vm inst 2
-      vm1 = if param1 < param2
-        then storeParam vm inst 3 1
-        else storeParam vm inst 3 0
+      vm1 =
+        if param1 < param2
+          then storeParam vm inst 3 1
+          else storeParam vm inst 3 0
       vm2 = step vm1 4
    in vm2
 execInstruction I_RBO inst vm =
@@ -103,7 +104,6 @@ execInstruction I_RBO inst vm =
       vm1 = setRB vm param1
       vm2 = step vm1 2
    in vm2
-
 execInstruction I_HALT inst vm = halt vm
 
 execCurrent vm =
@@ -111,4 +111,7 @@ execCurrent vm =
       op = opcode inst
    in execInstruction op inst vm
 
-run vm = (isIoWait vm, isHalted vm, execCurrent vm)
+run vm =
+  if isIoWait vm || isHalted vm
+    then vm
+    else run $ execCurrent vm

@@ -7,6 +7,8 @@ module Instruction
   , Mode(..)
   ) where
 
+import Text.Show.Functions
+
 data Operation
   = I_ADD
   | I_MUL
@@ -18,14 +20,17 @@ data Operation
   | I_EQ
   | I_RBO
   | I_HALT
+  deriving Show
 
 data Mode
   = MODE_REFERENCE
   | MODE_VALUE
   | MODE_RELATIVE
+  deriving Show
 
 data Instruction =
   Instruction Operation Mode Mode Mode
+  deriving Show
 
 parseInstruction :: Int -> Instruction
 opcode :: Instruction -> Operation

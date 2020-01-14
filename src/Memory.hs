@@ -84,7 +84,7 @@ step (Memory vm input output ip rb halted) steps = Memory vm input output (ip + 
 
 getInstruction (Memory vm input output ip rb halted) = parseInstruction $ vm ! ip
 
-loadRelative (Memory vm input output ip rb halted) n = vm ! ip + n
+loadRelative (Memory vm input output ip rb halted) n = vm ! (ip + n)
 
 getRB (Memory vm input output ip rb halted) = rb
 
