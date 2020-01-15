@@ -62,13 +62,13 @@ hasInput (Memory vm (x :<| xs) output ip rb halted) = True
 
 store (Memory vm input output ip rb halted) position value = Memory (insert position value vm) input output ip rb halted
 
-load (Memory vm input output ip rb halted) position = vm ! position
+load (Memory vm input output ip rb halted) position = findWithDefault 0 position vm
 
 getInput (Memory vm (val :<| inp) outp ip rb halted) = (val, Memory vm inp outp ip rb halted)
 
 addInput (Memory vm inp outp ip rb halted) value = Memory vm (inp |> value) outp ip rb halted
 
-addOutput (Memory vm inp outp ip rb halted) value = Memory vm (inp |> value) outp ip rb halted
+addOutput (Memory vm inp outp ip rb halted) value = Memory vm inp (outp |> value) ip rb halted
 
 getOutput (Memory vm inp (val :<| outp) ip rb halted) = (val, Memory vm inp outp ip rb halted)
 

@@ -39,8 +39,9 @@ isIoWait vm =
 
 jumpIfTrue :: Memory -> Int -> Mode -> Int -> Int -> Int -> Memory
 jumpIfTrue vm 0 mod rb addr steps            = setIP vm steps
-jumpIfTrue vm 1 MODE_REFERENCE rb addr steps = setIP vm addr
-jumpIfTrue vm 1 MODE_RELATIVE rb addr steps  = setIP vm (rb + addr)
+jumpIfTrue vm _ MODE_REFERENCE rb addr steps = setIP vm addr
+jumpIfTrue vm _ MODE_RELATIVE rb addr steps  = setIP vm (rb + addr)
+jumpIfTrue vm _ MODE_VALUE rb addr steps     = setIP vm addr
 
 neg :: Int -> Int
 neg 0 = 1
@@ -67,7 +68,7 @@ execInstruction I_IN inst vm =
 execInstruction I_OUT inst vm =
   let param = getParam vm inst 1
       vm1 = addOutput vm param
-      vm2 = step vm 2
+      vm2 = step vm1 2
    in vm2
 execInstruction I_JT inst vm =
   let param1 = getParam vm inst 1
@@ -105,6 +106,7 @@ execInstruction I_RBO inst vm =
       vm2 = step vm1 2
    in vm2
 execInstruction I_HALT inst vm = halt vm
+execInstruction (I_UNKNOWN n) inst vm = halt $ store vm 10000 n
 
 execCurrent vm =
   let inst = getInstruction vm

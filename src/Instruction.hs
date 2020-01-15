@@ -20,6 +20,7 @@ data Operation
   | I_EQ
   | I_RBO
   | I_HALT
+  | I_UNKNOWN Int
   deriving Show
 
 data Mode
@@ -64,6 +65,7 @@ toOperation 7  = I_LT
 toOperation 8  = I_EQ
 toOperation 9  = I_RBO
 toOperation 99 = I_HALT
+toOperation n = I_UNKNOWN n
 
 toMode 0 = MODE_REFERENCE
 toMode 1 = MODE_VALUE

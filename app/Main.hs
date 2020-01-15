@@ -11,8 +11,8 @@ main = do
   let vm = fromProgram program
   print $ store vm 2 1234
   print $ load vm 1
-  let vm1 = addInput vm 10
-  let vm2 = addInput vm1 20
+  let vm1 = addInput vm 1
+  let vm2 = addInput vm1 2
   print vm2
   let vm3 = run vm2
   print vm3
