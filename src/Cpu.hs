@@ -45,7 +45,7 @@ jumpIfTrue vm _ MODE_VALUE rb addr steps     = setIP vm addr
 
 neg :: Int -> Int
 neg 0 = 1
-neg 1 = 0
+neg n = 0
 
 execInstruction :: Operation -> Instruction -> Memory -> Memory
 execInstruction I_ADD inst vm =
@@ -72,16 +72,22 @@ execInstruction I_OUT inst vm =
    in vm2
 execInstruction I_JT inst vm =
   let param1 = getParam vm inst 1
-      addr = loadRelative vm 2
-      mod = mode inst 2
-      rb = getRB vm
-   in jumpIfTrue vm param1 mod rb addr 3
+      addr = getParam vm inst 2
+   in if param1 == 0
+        then step vm 3
+        else setIP vm addr
+--      mod = mode inst 2
+--      rb = getRB vm
+--   in jumpIfTrue vm param1 mod rb addr 3
 execInstruction I_JF inst vm =
   let param1 = getParam vm inst 1
-      addr = loadRelative vm 2
-      mod = mode inst 2
-      rb = getRB vm
-   in jumpIfTrue vm (neg param1) mod rb addr 3
+      -- addr = loadRelative vm 2
+      addr = getParam vm inst 2
+     --  mod = mode inst 2
+     --  rb = getRB vm
+   in if param1 == 0
+        then setIP vm addr
+        else step vm 3 -- in jumpIfTrue vm (neg param1) mod rb addr 3
 execInstruction I_EQ inst vm =
   let param1 = getParam vm inst 1
       param2 = getParam vm inst 2
