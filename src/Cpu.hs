@@ -102,7 +102,7 @@ execInstruction I_LT inst vm =
    in vm2
 execInstruction I_RBO inst vm =
   let param1 = getParam vm inst 1
-      vm1 = setRB vm param1
+      vm1 = setRB vm $ getRB vm + param1
       vm2 = step vm1 2
    in vm2
 execInstruction I_HALT inst vm = halt vm
