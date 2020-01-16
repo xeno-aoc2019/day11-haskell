@@ -9,9 +9,7 @@ main :: IO ()
 main = do
   program <- readProgramFromFile "input.txt"
   let vm = fromProgram program
-  print $ store vm 2 1234
-  print $ load vm 1
-  let vm1 = addInput vm 1
+  let vm1 = addInput vm 8
   let vm2 = addInput vm1 2
   print vm2
   let vm3 = run vm2
