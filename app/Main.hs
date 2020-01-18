@@ -1,10 +1,12 @@
 module Main where
 
 import Data.Char
+import Data.List
 import Input     (readProgramFromFile)
 import Memory    (Memory, fromProgram, store, load, addInput, getInput, addOutput, getOutput, isHalted)
 import Cpu       (run)
 import Panel
+import Data.Set
 
 data Action = Action Color Turn
 
@@ -49,20 +51,32 @@ task1 :: IO()
 task1 = do
   program <- readProgramFromFile "input.txt"
   let vm = fromProgram program
-      outdoors = initialOutdoors
-      outdoors2 = executeRobot outdoors vm 0
+      outdoors2 = executeRobot initialOutdoors vm 0
    in
       putStrLn ("Solution to 1: Painted squares: " ++ show (paintedSquares outdoors2))
+
+toDisplayChar :: (Set (Int,Int)) -> (Int,Int) -> Char
+toDisplayChar whites coord = if member coord whites then '#' else ' '
+
+toDisplayString whites xline y =
+   let coords = Prelude.map (\x -> (x,y)) xline
+    in Prelude.map (toDisplayChar whites) coords
+
+toDisplayStrings whites xline yline =
+    Prelude.map (\y -> toDisplayString whites xline y) yline
 
 task2 = do
   program <- readProgramFromFile "input.txt"
   let vm = fromProgram program
-      outdoors = initialOutdoors
-      outdoors2 = executeRobot outdoors vm 1
+      outdoors2 = executeRobot initialOutdoors vm 1
       (x1,y1,x2,y2) = gridCoordinates outdoors2
       pixels = whitePixels outdoors2
+      xline = [x1..x2]
+      yline = reverse [y2..y1]
+      lines = toDisplayStrings pixels xline yline
+      matrix = intercalate "\n" lines
    in
-      putStrLn ("Painted squares: " ++ show (x1,y1,x2,y2))
+      putStrLn (matrix)
 
 main :: IO ()
 main = do
