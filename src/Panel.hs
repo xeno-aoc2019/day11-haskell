@@ -1,15 +1,17 @@
-module Panel (Position, initialOutdoors, turnAndMove, Panel, Turn(..), Color(..), move, paint, colorAtRobot, Outdoors) where
+module Panel (Position, initialOutdoors, turnAndMove, paintedSquares, Panel, Turn(..), Color(..), move, paint, colorAtRobot, Outdoors) where
 
 import Direction
 import Data.List.Index
 import Data.Map.Strict
 import Data.Sequence
 import Prelude hiding (filter, lookup, map, null)
+import Text.Show.Functions
 
-data Color = Black | White
-data Position = Position Int Int Direction
-data Panel = Panel (Map (Int,Int) Color)
-data Outdoors = Outdoors Panel Position
+
+data Color = Black | White deriving Show
+data Position = Position Int Int Direction deriving Show
+data Panel = Panel (Map (Int,Int) Color) deriving Show
+data Outdoors = Outdoors Panel Position deriving Show
 
 initialOutdoors = Outdoors (Panel Data.Map.Strict.empty) (Position 0 0 North)
 
@@ -32,3 +34,6 @@ paint (Outdoors panel position) color = Outdoors (paintPanel panel position colo
 
 colorAtRobot :: Outdoors -> Color
 colorAtRobot (Outdoors (Panel panel) (Position x y dir)) = findWithDefault Black (x,y) panel
+
+paintedSquares :: Outdoors -> Int
+paintedSquares (Outdoors (Panel panel) pos) = size panel

@@ -2,7 +2,7 @@ module Input
   ( readProgramFromFile
   ) where
 
-import           Data.Char
+import Data.Char
 
 c x = ord x - ord '0'
 

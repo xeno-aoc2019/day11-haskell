@@ -54,6 +54,7 @@ main = do
   let vm = fromProgram program
       (vm1, action) = stepProgram vm 0
       outdoors = initialOutdoors
-   in putStrLn "x" -- (show outdoors)
+      outdoors2 = executeRobot outdoors vm 0
+   in putStrLn ("Painted squares: " ++ show (paintedSquares outdoors2))
 
 --  putStrLn ("Answer 2: " ++ show out2)

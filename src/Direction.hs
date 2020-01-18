@@ -1,11 +1,15 @@
 module Direction (Direction(..), Turn(..), turn, rightOf, leftOf) where
 
+import Text.Show.Functions
+
 data Direction = North
                | South
                | East
                | West
+  deriving Show 
 
-data Turn = LeftTurn | RightTurn
+data Turn = LeftTurn | RightTurn 
+  deriving Show
 
 leftOf :: Direction -> Direction
 leftOf North = West
