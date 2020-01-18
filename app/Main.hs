@@ -59,11 +59,10 @@ task2 = do
   let vm = fromProgram program
       outdoors = initialOutdoors
       outdoors2 = executeRobot outdoors vm 1
-      gridc = gridCoordinates outdoors2
-      pixels = whitePixels 
+      (x1,y1,x2,y2) = gridCoordinates outdoors2
+      pixels = whitePixels outdoors2
    in
-     
-      putStrLn ("Painted squares: " ++ show gridc)
+      putStrLn ("Painted squares: " ++ show (x1,y1,x2,y2))
 
 main :: IO ()
 main = do

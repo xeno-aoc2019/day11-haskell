@@ -6,6 +6,7 @@ import Data.Map.Strict
 import Data.Sequence
 import Prelude hiding (filter, lookup, null)
 import Text.Show.Functions
+import Data.Set
 
 
 data Color = Black | White deriving Show
@@ -31,7 +32,7 @@ turnAndMove (Outdoors panel (Position x y dir)) turnDir =
    in Outdoors panel $ move newPos
 
 paintPanel :: Panel -> Position -> Color -> Panel
-paintPanel (Panel panel) (Position x y dir) color = Panel $ insert (x,y) color panel
+paintPanel (Panel panel) (Position x y dir) color = Panel $ Data.Map.Strict.insert (x,y) color panel
 
 paint :: Outdoors -> Color -> Outdoors
 paint (Outdoors panel position) color = Outdoors (paintPanel panel position color) position
@@ -40,7 +41,7 @@ colorAtRobot :: Outdoors -> Color
 colorAtRobot (Outdoors (Panel panel) (Position x y dir)) = findWithDefault Black (x,y) panel
 
 paintedSquares :: Outdoors -> Int
-paintedSquares (Outdoors (Panel panel) pos) = size panel
+paintedSquares (Outdoors (Panel panel) pos) = Data.Map.Strict.size panel
 
 whiteOnlyPanel :: Panel -> Panel
 whiteOnlyPanel (Panel panel) = Panel (Data.Map.Strict.filter isWhite panel)
@@ -51,9 +52,9 @@ getY (x,y) = y
 pkeys :: Panel -> [(Int,Int)]
 pkeys (Panel panel) = keys panel
 
-whitePixels :: Outdoors -> [(Int,Int)]
+whitePixels :: Outdoors -> (Set (Int,Int))
 whitePixels (Outdoors panel location) =
-  pkeys $ whiteOnlyPanel panel
+  Data.Set.fromList $ (pkeys $ whiteOnlyPanel panel)
 
 gridCoordinates :: Outdoors -> (Int,Int,Int,Int)
 gridCoordinates (Outdoors panel position) =
