@@ -45,16 +45,27 @@ executeRobot outdoors vm input =
       else executeRobot outdoors1 vm1 nextInput
 
 
+task1 :: IO()
+task1 = do
+  program <- readProgramFromFile "input.txt"
+  let vm = fromProgram program
+      outdoors = initialOutdoors
+      outdoors2 = executeRobot outdoors vm 0
+   in
+      putStrLn ("Solution to 1: Painted squares: " ++ show (paintedSquares outdoors2))
 
-
+task2 = do
+  program <- readProgramFromFile "input.txt"
+  let vm = fromProgram program
+      outdoors = initialOutdoors
+      outdoors2 = executeRobot outdoors vm 1
+      gridc = gridCoordinates outdoors2
+      pixels = whitePixels 
+   in
+     
+      putStrLn ("Painted squares: " ++ show gridc)
 
 main :: IO ()
 main = do
-  program <- readProgramFromFile "input.txt"
-  let vm = fromProgram program
-      (vm1, action) = stepProgram vm 0
-      outdoors = initialOutdoors
-      outdoors2 = executeRobot outdoors vm 0
-   in putStrLn ("Painted squares: " ++ show (paintedSquares outdoors2))
-
---  putStrLn ("Answer 2: " ++ show out2)
+  task1
+  task2

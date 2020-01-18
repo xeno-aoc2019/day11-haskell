@@ -1,10 +1,10 @@
-module Panel (Position, initialOutdoors, turnAndMove, paintedSquares, Panel, Turn(..), Color(..), move, paint, colorAtRobot, Outdoors) where
+module Panel (Position, whitePixels, initialOutdoors, gridCoordinates, turnAndMove, paintedSquares, Panel, Turn(..), Color(..), move, paint, colorAtRobot, Outdoors) where
 
 import Direction
 import Data.List.Index
 import Data.Map.Strict
 import Data.Sequence
-import Prelude hiding (filter, lookup, map, null)
+import Prelude hiding (filter, lookup, null)
 import Text.Show.Functions
 
 
@@ -12,6 +12,10 @@ data Color = Black | White deriving Show
 data Position = Position Int Int Direction deriving Show
 data Panel = Panel (Map (Int,Int) Color) deriving Show
 data Outdoors = Outdoors Panel Position deriving Show
+
+isWhite :: Color -> Bool
+isWhite White = True
+isWhite Black = False
 
 initialOutdoors = Outdoors (Panel Data.Map.Strict.empty) (Position 0 0 North)
 
@@ -37,3 +41,28 @@ colorAtRobot (Outdoors (Panel panel) (Position x y dir)) = findWithDefault Black
 
 paintedSquares :: Outdoors -> Int
 paintedSquares (Outdoors (Panel panel) pos) = size panel
+
+whiteOnlyPanel :: Panel -> Panel
+whiteOnlyPanel (Panel panel) = Panel (Data.Map.Strict.filter isWhite panel)
+
+getX (x,y) = x
+getY (x,y) = y
+
+pkeys :: Panel -> [(Int,Int)]
+pkeys (Panel panel) = keys panel
+
+whitePixels :: Outdoors -> [(Int,Int)]
+whitePixels (Outdoors panel location) =
+  pkeys $ whiteOnlyPanel panel
+
+gridCoordinates :: Outdoors -> (Int,Int,Int,Int)
+gridCoordinates (Outdoors panel position) =
+  let whites = whiteOnlyPanel panel
+      wk = pkeys whites
+      xs = Prelude.map getX wk
+      ys = Prelude.map getY wk
+      minx = minimum xs
+      maxx = maximum xs
+      miny = minimum ys
+      maxy = maximum ys
+   in (minx,maxy,maxx,miny)
